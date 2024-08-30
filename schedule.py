@@ -30,7 +30,12 @@ class NbaSchedule:
                 print()
             print('------')
 
-    def fetch_date_schedule(self):
+    def fetch_id_schedule(self, gameid=None):
+        """Fetches the game schedule using game id"""
+
+        pass
+
+    def fetch_date_schedule(self, date=None):
         """Fetches the game schedules for the given date"""
 
         pass
