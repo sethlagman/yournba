@@ -19,16 +19,19 @@ class NbaSchedule:
     def fetch_shedule(self):
         """Fetches the game schedules for the whole season"""
 
-        season_year = self.schedule['leagueSchedule']['seasonYear']
-        games = self.schedule['leagueSchedule']['gameDates']
-        for game in games[:2]:
-            print(f'Date: {game['gameDate'][:10]}')
-            for sched in game['games']:
-                print(f'Game: {sched['gameCode']}')
-                print(f'Home: {sched['homeTeam']['teamCity']} {sched['homeTeam']['teamName']}')
-                print(f'Away: {sched['awayTeam']['teamCity']} {sched['awayTeam']['teamName']}')
-                print()
-            print('------')
+        gameSchedule = {
+            game['gameDate'][:10]: [
+                {
+                    'gameCode': schedule['gameCode'],
+                    'Home': f"{schedule['homeTeam']['teamCity']} {schedule['homeTeam']['teamName']}",
+                    'Away': f"{schedule['awayTeam']['teamCity']} {schedule['awayTeam']['teamName']}",
+                }
+                for schedule in game['games']
+            ]
+            for game in self.schedule['leagueSchedule']['gameDates'][:2]
+        }
+
+        print(json.dumps(gameSchedule, indent=2))
 
     def fetch_id_schedule(self, gameid=None):
         """Fetches the game schedule using game id"""
