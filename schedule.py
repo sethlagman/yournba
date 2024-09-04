@@ -20,15 +20,16 @@ class NbaSchedule:
         """Fetches the game schedules for the whole season"""
 
         gameSchedule = {
-            game['gameDate'][:10]: [
+            games['gameDate'][:10]: [
                 {
-                    'gameCode': schedule['gameCode'],
-                    'Home': f"{schedule['homeTeam']['teamCity']} {schedule['homeTeam']['teamName']}",
-                    'Away': f"{schedule['awayTeam']['teamCity']} {schedule['awayTeam']['teamName']}",
+                    'gameId': game['gameId'],
+                    'gameCode': game['gameCode'],
+                    'Home': f"{game['homeTeam']['teamCity']} {game['homeTeam']['teamName']}",
+                    'Away': f"{game['awayTeam']['teamCity']} {game['awayTeam']['teamName']}",
                 }
-                for schedule in game['games']
+                for game in games['games']
             ]
-            for game in self.schedule['leagueSchedule']['gameDates'][:2]
+            for games in self.schedule['leagueSchedule']['gameDates']
         }
 
         print(json.dumps(gameSchedule, indent=2))
