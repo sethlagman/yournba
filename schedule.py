@@ -19,11 +19,12 @@ class NbaSchedule:
     def fetch_shedule(self):
         """Fetches the game schedules for the whole season"""
 
-        gameSchedule = {
+        return {
             games['gameDate'][:10]: [
                 {
                     'gameId': game['gameId'],
                     'gameCode': game['gameCode'],
+                    'gameTime': game['gameStatusText'],
                     'Home': f"{game['homeTeam']['teamCity']} {game['homeTeam']['teamName']}",
                     'Away': f"{game['awayTeam']['teamCity']} {game['awayTeam']['teamName']}",
                 }
@@ -31,8 +32,6 @@ class NbaSchedule:
             ]
             for games in self.schedule['leagueSchedule']['gameDates']
         }
-
-        print(json.dumps(gameSchedule, indent=2))
 
     def fetch_id_schedule(self, gameid=None):
         """Fetches the game schedule using game id"""
@@ -65,7 +64,7 @@ class NbaSchedule:
 def main():
 
     nbaschedule = NbaSchedule()
-    nbaschedule.fetch_shedule()
+    print(json.dumps(nbaschedule.fetch_shedule(), indent=2))
 
 if __name__ == '__main__':
     main()
