@@ -48,7 +48,9 @@ class NbaSchedule:
     def fetch_date_schedule(self, date=None):
         """Fetches the game schedules for the given date"""
 
-        pass
+        for key, value in self.fetch_shedule().items():
+            if key == date:
+                return {date: value}
 
 
 def main():
