@@ -32,25 +32,19 @@ class NbaSchedule:
     def fetch_id_schedule(self, gameid=None):
         """Fetches the game schedule using game id"""
 
-        for games in self.schedule['leagueSchedule']['gameDates']:
-            for game in games['games']:
+        for dates, games in self.fetch_shedule().items():
+            for game in games:
                 if game['gameId'] == gameid:
                     return {
-                        games['gameDate'][:10]: {
-                        'gameId': game['gameId'],
-                        'gameCode': game['gameCode'],
-                        'gameTime': game['gameStatusText'],
-                        'Home': f"{game['homeTeam']['teamCity']} {game['homeTeam']['teamName']}",
-                        'Away': f"{game['awayTeam']['teamCity']} {game['awayTeam']['teamName']}",
+                        dates: game
                     }
-                }
 
     def fetch_date_schedule(self, date=None):
         """Fetches the game schedules for the given date"""
 
-        for key, value in self.fetch_shedule().items():
-            if key == date:
-                return {date: value}
+        for dates, games in self.fetch_shedule().items():
+            if dates == date:
+                return {date: games}
 
 
 def main():
