@@ -12,8 +12,14 @@ class NbaSchedule:
 
         self.schedule = FileHandler('schedule').read()
 
-    def fetch_shedule(self):
-        """Fetches the game schedules for the whole season"""
+    def fetch_shedule(self) -> dict:
+        """
+        Fetches the game schedules for the whole season
+        
+        Returns:
+            dict: - Full schedule for the current NBA season
+        
+        """
         
         return {
             games['gameDate'][:10]: [
@@ -29,8 +35,16 @@ class NbaSchedule:
             for games in self.schedule['leagueSchedule']['gameDates']
         }
 
-    def fetch_id_schedule(self, gameid=None):
-        """Fetches the game schedule using game id"""
+    def fetch_id_schedule(self, gameid: str) -> str:
+        """
+        Fetches the game schedule using game id
+
+        Args:
+            gameid (string): - 10 Digits game id
+
+        Returns:
+            string: - Game associated with the id
+        """
 
         for dates, games in self.fetch_shedule().items():
             for game in games:
@@ -39,8 +53,16 @@ class NbaSchedule:
                         dates: game
                     }
 
-    def fetch_date_schedule(self, date=None):
-        """Fetches the game schedules for the given date"""
+    def fetch_date_schedule(self, date=None) -> dict:
+        """
+        Fetches the game schedules for the given date
+
+        Args:
+            date (string): - MM/DD/YYYY
+
+        Returns:
+            dict: - Game matchups for the date 
+        """
 
         for dates, games in self.fetch_shedule().items():
             if dates == date:
