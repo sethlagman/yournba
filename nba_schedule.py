@@ -18,7 +18,6 @@ class NbaSchedule:
         
         Returns:
             dict: - Full schedule for the current NBA season
-        
         """
         
         return {
