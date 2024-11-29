@@ -35,7 +35,7 @@ class NbaSchedule:
             for games in self.schedule['leagueSchedule']['gameDates']
         }
 
-    def fetch_id_schedule(self, gameid: str) -> str:
+    def fetch_id_schedule(self, gameid: str) -> dict:
         """
         Fetches the game schedule using game id
 
@@ -43,7 +43,7 @@ class NbaSchedule:
             gameid (string): - 10 Digits game id
 
         Returns:
-            string: - Game associated with the id
+            dict: - Game associated with the id
         """
 
         for dates, games in self.fetch_shedule().items():
@@ -53,7 +53,7 @@ class NbaSchedule:
                         dates: game
                     }
 
-    def fetch_date_schedule(self, date=None) -> dict:
+    def fetch_date_schedule(self, date: str) -> dict:
         """
         Fetches the game schedules for the given date
 
