@@ -6,7 +6,7 @@ import json
 class FileHandler:
     """Handles files"""
 
-    def __init__(self, endpoint):
+    def __init__(self, endpoint: str):
         """Initialize attributes"""
 
         self.endpoint = endpoint
