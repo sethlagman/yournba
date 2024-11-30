@@ -8,6 +8,7 @@ class NbaStatistics:
     """
 
     def __init__(self) -> None:
+        """Initialize attributes"""
         
         self.statistics = FileHandler('statistics').read()
 
@@ -24,9 +25,13 @@ class NbaStatistics:
             for player in self.statistics['payload']['players']
         }
     
-    def fetch_player_statistics(self, first_name, last_name):
+    def fetch_player_statistics(self, first_name: str, last_name: str) -> dict:
         """
-        Retrieves the given player's statistics 
+        Retrieves the given player's statistics
+
+        Args:
+            first_name (string): - First name of the player
+            last_name (string): - Last name of the player
         """
 
         formatted_name = f'{first_name}_{last_name}'.lower()

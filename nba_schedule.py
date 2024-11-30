@@ -5,7 +5,7 @@ from filehandler import FileHandler
 class NbaSchedule:
     """Retrieves the schedule of NBA games"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize attributes"""
 
         self.schedule = FileHandler('schedule').read()
