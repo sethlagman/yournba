@@ -1,6 +1,6 @@
 {
     "endpoints": {
         "schedule": "https://cdn.nba.com/static/json/staticData/scheduleLeagueV2_1.json",
-        "statistics": "https://ph.global.nba.com/stats2/league/playerstats.json?season=2024&seasonType=2&statType=points&position=All&individual=All&conference=All&division=All&total=perGame&qualified=false&split=All+Team&country=All&team=All&locale=en"
+        "statistics": "https://stats.nba.com/stats/leagueLeaders?LeagueID=00&PerMode=PerGame&Scope=S&Season=2024-25&SeasonType=Regular%20Season&StatCategory=PTS"
     }
 }
