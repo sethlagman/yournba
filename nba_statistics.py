@@ -1,7 +1,5 @@
 """NBA Statistics"""
 
-import json
-
 from filehandler import FileHandler
 
 class NbaStatistics:
@@ -21,8 +19,20 @@ class NbaStatistics:
             dict: - Statistics of the players
         """
 
-        for player in self.statistics['payload']['players']:
-            print(json.dumps(player, indent=2))
+        return {
+            player['playerProfile']['code']: player['statAverage']
+            for player in self.statistics['payload']['players']
+        }
+    
+    def fetch_player_statistics(self, first_name, last_name):
+        """
+        Retrieves the given player's statistics 
+        """
+
+        formatted_name = f'{first_name}_{last_name}'.lower()
+        for name, statistics in self.fetch_statistics().items():
+            if name == formatted_name:
+                return {name: statistics}
 
 
 def main():
