@@ -6,23 +6,28 @@ import json
 class FileHandler:
     """Handles files"""
 
-    def __init__(self, endpoint: str):
+    def __init__(self, endpoint: str=''):
         """Initialize attributes"""
 
         self.endpoint = endpoint
-        self.response = requests.get(json.load(open('endpoints.json'))['endpoints'][endpoint])
+        if endpoint:
+            self.response = requests.get(json.load(open('endpoints.json'))['endpoints'][endpoint])
 
-    def store(self):
+    def store(self, filename=None):
         """Stores the file"""
 
         with open(self.endpoint + '.json', 'w') as file:
             file.write(json.dumps(self.response.json(), indent=2))
 
-    def read(self):
+    def read(self, filename=None):
         """Reads the file"""
 
-        with open(self.endpoint + '.json', 'r') as file:
-            return json.load(file)
+        if filename is None:
+            with open(self.endpoint + '.json', 'r') as file:
+                return json.load(file)
+        else:
+            with open(filename, 'r') as file:
+                return json.load(file)
 
     def update(self):
         """Regularly updates the file given a time interval"""
