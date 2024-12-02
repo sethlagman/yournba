@@ -1,5 +1,5 @@
 venv/
-pycache/
+__pycache__/
 README.md
-nba_scraper\nba_scraper\__pycache__
-nba_scraper\nba_scraper\spiders\__pycache__
+nba_scraper/nba_scraper/__pycache__/
+nba_scraper/nba_scraper/spiders/__pycache__/
