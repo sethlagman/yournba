@@ -1,6 +1,6 @@
 """NBA Statistics"""
 
-from filehandler import FileHandler
+from modules.filehandler import FileHandler
 
 class NbaStatistics:
     """
@@ -10,7 +10,7 @@ class NbaStatistics:
     def __init__(self) -> None:
         """Initialize attributes"""
 
-        self.statistics = FileHandler().read(filename='nba_scraper\statistics.json')
+        self.statistics = FileHandler().read(filename=r'nba_data\statistics.json')
 
     def fetch_player_statistics(self, first_name: str, last_name: str) -> dict:
         """

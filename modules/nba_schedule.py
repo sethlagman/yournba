@@ -1,6 +1,6 @@
 """NBA Schedule"""
 
-from filehandler import FileHandler
+from modules.filehandler import FileHandler
 
 class NbaSchedule:
     """Retrieves the schedule of NBA games"""
