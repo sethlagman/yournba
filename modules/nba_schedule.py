@@ -1,5 +1,5 @@
 """NBA Schedule"""
-
+import json
 from filehandler import FileHandler
 
 class NbaSchedule:
@@ -18,7 +18,8 @@ class NbaSchedule:
             dict: - Full schedule for the current NBA season
         """
         
-        return {
+        return [
+            {
             games['gameDate'][:10]: [
                 {
                     'gameId': game['gameId'],
@@ -29,8 +30,9 @@ class NbaSchedule:
                 }
                 for game in games['games']
             ]
-            for games in self.schedule['leagueSchedule']['gameDates']
         }
+        for games in self.schedule['leagueSchedule']['gameDates']
+        ]
 
     def fetch_id_schedule(self, gameid: str) -> dict:
         """
