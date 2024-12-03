@@ -1,7 +1,5 @@
 """NBA Schedule"""
 
-import json
-
 from filehandler import FileHandler
 
 class NbaSchedule:

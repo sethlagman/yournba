@@ -1,6 +1,6 @@
 """NBA Statistics"""
 
-from modules.filehandler import FileHandler
+from filehandler import FileHandler
 
 class NbaStatistics:
     """
