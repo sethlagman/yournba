@@ -1,6 +1,8 @@
 """NBA Schedule"""
 
-from modules.filehandler import FileHandler
+import json
+
+from filehandler import FileHandler
 
 class NbaSchedule:
     """Retrieves the schedule of NBA games"""
@@ -8,7 +10,7 @@ class NbaSchedule:
     def __init__(self) -> None:
         """Initialize attributes"""
 
-        self.schedule = FileHandler('schedule').read()
+        self.schedule = FileHandler().read(r'nba_data\schedule.json')
 
     def fetch_shedule(self) -> dict:
         """
