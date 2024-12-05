@@ -9,6 +9,23 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 from modules.nba_schedule import *
 from modules.nba_statistics import *
 
+class MainFrame(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+        self.grid(column=0, row=0)
+
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure((1, 2), weight=1)
+        self.grid_columnconfigure((0, 1), weight=0)
+
+        title = ctk.CTkLabel(self, text="YourNBA", font=('', 50, 'bold'))
+        title.grid(column=1, row=0, pady=(20, 15))
+
+        sidebar = SideBarFrame(self)
+        entry = EntryFrame(self)
+        output = OutputFrame(self)
+
+
 class SideBarFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master, width=250)
@@ -60,22 +77,16 @@ class OutputFrame(ctk.CTkScrollableFrame):
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.geometry("850x650")
+        self.geometry(f'{850}x{650}')
         self.iconbitmap(r'images\nbalogo.ico')
         self.resizable(False, False)
         self.title('')
         self.protocol('WM_DELETE_WINDOW', self.exit_app)
         
-        self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure((1, 2), weight=1)
-        self.grid_columnconfigure((0, 1), weight=0)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
-        title = ctk.CTkLabel(self, text="YourNBA", font=('', 50, 'bold'))
-        title.grid(column=1, row=0, pady=(20, 15))
-
-        sidebar = SideBarFrame(self)
-        entry = EntryFrame(self)
-        output = OutputFrame(self)
+        mainframe = MainFrame(self)
 
     def exit_app(self):
         confirm = messagebox.askyesno('', 'Are you sure you want to close the application?')
