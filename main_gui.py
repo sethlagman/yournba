@@ -32,11 +32,19 @@ class SideBarFrame(ctk.CTkFrame):
         self.grid(column=0, row=0, rowspan=3, sticky='nsew', padx=(10, 0), pady=(10, 10))
         self.grid_propagate(0)
 
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(1, weight=0)
+        self.grid_rowconfigure(2, weight=0)
         self.grid_columnconfigure(0, weight=1)
 
         title = ctk.CTkLabel(self, text='Menu', font=('', 30, 'bold'))
-        title.grid(column=0, row=0, sticky='n', pady=(10, 15))
+        title.grid(column=0, row=0, sticky='n', pady=(30, 15))
+
+        schedules_btn = ctk.CTkButton(self, text='Schedule', height=35, width=150)
+        schedules_btn.grid(column=0, row=1, pady=(30, 30))
+
+        statistics_btn = ctk.CTkButton(self, text='Statistics', height=35, width=150)
+        statistics_btn.grid(column=0, row=2, pady=(20, 30))
 
 
 class EntryFrame(ctk.CTkFrame):
@@ -45,15 +53,23 @@ class EntryFrame(ctk.CTkFrame):
         self.grid(column=1, row=1, sticky='new')
         self.grid_propagate(0)
 
-        self.grid_columnconfigure(0, weight=5)
-        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=5)
+        self.grid_columnconfigure(2, weight=1)
 
-        search = ctk.CTkEntry(self, placeholder_text='Player, game id, schedule date, and etc.', height=30)
-        search.grid(row=1, column=0, sticky='ew', padx=(20, 5))
+        self.optionmenu_var = ctk.StringVar(value='Date')
+        optionmenu = ctk.CTkOptionMenu(self, values=['Date', 'Player', 'Game Id'], command=self.optionmenu_callback, variable=self.optionmenu_var)
+        optionmenu.grid(row=1, column=0)
 
-        search_btn = ctk.CTkButton(self, text='Search', height=30)
-        search_btn.grid(row=1,column=1, sticky='ew', padx=(5, 20))
+        self.search = ctk.CTkEntry(self, placeholder_text=f'Search for {self.optionmenu_var.get()}', height=30)
+        self.search.grid(row=1, column=1, sticky='ew', padx=(0, 10))
 
+        search_btn = ctk.CTkButton(self, text='Search', height=30, width=50)
+        search_btn.grid(row=1,column=2, sticky='ew', padx=(5, 20))
+    
+    def optionmenu_callback(self, choice):
+            self.search.configure(placeholder_text=f'Search for {choice}')
+            return choice
 
 class OutputFrame(ctk.CTkScrollableFrame):
     def __init__(self, master):
