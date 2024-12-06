@@ -58,7 +58,7 @@ class EntryFrame(ctk.CTkFrame):
         self.grid_columnconfigure(2, weight=1)
 
         self.optionmenu_var = ctk.StringVar(value='Date')
-        optionmenu = ctk.CTkOptionMenu(self, values=['Date', 'Player', 'Game Id'], command=self.optionmenu_callback, variable=self.optionmenu_var)
+        optionmenu = ctk.CTkOptionMenu(self, values=['Date', 'Player', 'Game Id'], height=31, command=self.optionmenu_callback, variable=self.optionmenu_var)
         optionmenu.grid(row=1, column=0)
 
         self.search = ctk.CTkEntry(self, placeholder_text=f'Search for {self.optionmenu_var.get()}', height=30)
