@@ -15,21 +15,38 @@ class MainFrame(ctk.CTkFrame):
         self.grid(column=0, row=0)
 
         self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure((1, 2), weight=1)
+        self.grid_rowconfigure((1, 2, 3), weight=1)
         self.grid_columnconfigure((0, 1), weight=0)
 
-        title = ctk.CTkLabel(self, text="YourNBA", font=('', 50, 'bold'))
+        title = ctk.CTkLabel(self, text='YourNBA', font=('', 50, 'bold'))
         title.grid(column=1, row=0, pady=(20, 15))
 
         sidebar = SideBarFrame(self)
         entry = EntryFrame(self)
         output = OutputFrame(self)
+        pagination = PaginationFrame(self)
+
+
+class PaginationFrame(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master, fg_color='transparent')
+        self.grid(column=1, row=3, sticky='ew', padx=(10, 0))
+        self.grid_propagate(0)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure((0, 1), weight=1)
+
+        next_btn = ctk.CTkButton(self, text='Next', height=30, width=210)
+        next_btn.grid(row=0, column=1, pady=(0, 5))
+
+        previous_btn = ctk.CTkButton(self, text='Previous', height=30, width=210)
+        previous_btn.grid(row=0, column=0, pady=(0, 5))
 
 
 class SideBarFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master, width=250)
-        self.grid(column=0, row=0, rowspan=3, sticky='nsew', padx=(10, 0), pady=(10, 10))
+        self.grid(column=0, row=0, rowspan=4, sticky='nsew', padx=(10, 0), pady=(10, 10))
         self.grid_propagate(0)
 
         self.grid_rowconfigure(0, weight=0)
@@ -71,33 +88,34 @@ class EntryFrame(ctk.CTkFrame):
             self.search.configure(placeholder_text=f'Search for {choice}')
             return choice
 
+
 class OutputFrame(ctk.CTkScrollableFrame):
-    def __init__(self, master):
+    def __init__(self, master, data='schedule'):
         super().__init__(master, height=650, width=545)
         self.grid(column=1, row=2, sticky='ew', padx=(10, 10), pady=(10, 10))
         self.grid_columnconfigure(0, weight=1)
 
-        current_date = f'{d.today().month}/0{d.today().day}/{d.today().year}'
-        schedules = NbaSchedule().fetch_shedule()
-        
-        for schedule in schedules[150:200]:
-            for date, games in schedule.items():
-                date_label = ctk.CTkLabel(self, text=date)
-                date_label.grid()
-                for game in games:
-                    matchup = f'{game['Home']} vs {game['Away']}'
-                    matchup_label = ctk.CTkLabel(self, text=matchup)
-                    matchup_label.grid()
+        if data == 'schedule':
+            current_date = f'{d.today().month}/0{d.today().day}/{d.today().year}'
+            schedules = NbaSchedule().fetch_shedule()
+            for schedule in schedules[150:200]:
+                for date, games in schedule.items():
+                    date_label = ctk.CTkLabel(self, text=date)
+                    date_label.grid()
+                    for game in games:
+                        matchup = f'{game['Home']} vs {game['Away']}'
+                        matchup_label = ctk.CTkLabel(self, text=matchup)
+                        matchup_label.grid()
 
 
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.geometry(f'{850}x{650}')
+        self.geometry(f'{850}x{700}')
         self.iconbitmap(r'images\nbalogo.ico')
         self.resizable(False, False)
         self.title('')
-        self.protocol('WM_DELETE_WINDOW', self.exit_app)
+        #self.protocol('WM_DELETE_WINDOW', self.exit_app)
         
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
