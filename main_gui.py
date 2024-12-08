@@ -20,10 +20,10 @@ class MainFrame(ctk.CTkFrame):
 
         title = ctk.CTkLabel(self, text='YourNBA', font=('', 50, 'bold'))
         title.grid(column=1, row=0, pady=(20, 15))
-
-        sidebar = SideBarFrame(self)
+        
         entry = EntryFrame(self)
         output = OutputFrame(self)
+        sidebar = SideBarFrame(self, output_frame=output)
         pagination = PaginationFrame(self, output_frame=output, current_page=output.current_page)
 
 
@@ -53,7 +53,7 @@ class PaginationFrame(ctk.CTkFrame):
 
 
 class SideBarFrame(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, output_frame):
         super().__init__(master, width=250)
         self.grid(column=0, row=0, rowspan=4, sticky='nsew', padx=(10, 0), pady=(10, 10))
         self.grid_propagate(0)
@@ -63,14 +63,22 @@ class SideBarFrame(ctk.CTkFrame):
         self.grid_rowconfigure(2, weight=0)
         self.grid_columnconfigure(0, weight=1)
 
+        self.output_frame = output_frame
+
         title = ctk.CTkLabel(self, text='Menu', font=('', 30, 'bold'))
         title.grid(column=0, row=0, sticky='n', pady=(30, 15))
 
-        schedules_btn = ctk.CTkButton(self, text='Schedule', height=35, width=150)
+        schedules_btn = ctk.CTkButton(self, text='Schedule', height=35, width=150, command=self.update_output_to_schedule)
         schedules_btn.grid(column=0, row=1, pady=(30, 30))
 
-        statistics_btn = ctk.CTkButton(self, text='Statistics', height=35, width=150)
+        statistics_btn = ctk.CTkButton(self, text='Statistics', height=35, width=150, command=self.update_output_to_statistics)
         statistics_btn.grid(column=0, row=2, pady=(20, 30))
+
+    def update_output_to_schedule(self):
+        self.output_frame.update_output('schedule')
+
+    def update_output_to_statistics(self):
+        self.output_frame.update_output('statistics')
 
 
 class EntryFrame(ctk.CTkFrame):
@@ -99,12 +107,12 @@ class EntryFrame(ctk.CTkFrame):
 
 
 class OutputFrame(ctk.CTkScrollableFrame):
-    def __init__(self, master, data='schedule', items_per_page=10, current_page=0):
+    def __init__(self, master, items_per_page=10, current_page=0):
         super().__init__(master, height=650, width=545)
         self.grid(column=1, row=2, sticky='ew', padx=(10, 10), pady=(10, 10))
         self.grid_columnconfigure(0, weight=1)
         
-        self.data = data
+        self.output = 'game_today'
         self.items_per_page = items_per_page
         self.current_page = current_page
         self.start_index = self.current_page * self.items_per_page
@@ -112,9 +120,30 @@ class OutputFrame(ctk.CTkScrollableFrame):
 
         self.load_page_data()
 
+    def update_output(self, output):
+        self.output = output
+        self.clear_content()
+        self.load_page_data()
+
     def load_page_data(self):
-        if self.data == 'schedule':
+        if self.output == 'game_today':
             current_date = f'{d.today().month}/0{d.today().day}/{d.today().year}'
+            schedules = NbaSchedule().fetch_date_schedule(current_date)
+            for schedule in schedules:
+                for date, games in schedule.items():
+                    date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
+                    date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+                    for game in games:
+                        if game['Home'].strip() and game['Away'].strip():
+                            matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
+                            matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
+                            matchup_label.grid(sticky='w', padx=(20, 0))
+                        else:
+                            matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
+                            matchup_label.grid(sticky='w', padx=(20, 0))
+                            break
+
+        elif self.output == 'schedule':
             schedules = NbaSchedule().fetch_shedule()[self.start_index:self.end_index]
             for schedule in schedules:
                 for date, games in schedule.items():
@@ -122,14 +151,14 @@ class OutputFrame(ctk.CTkScrollableFrame):
                     date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
                     for game in games:
                         if game['Home'].strip() and game['Away'].strip():
-                            matchup = f'{game['Home']} vs {game['Away']}'
+                            matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
                             matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
                             matchup_label.grid(sticky='w', padx=(20, 0))
                         else:
                             matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
                             matchup_label.grid(sticky='w', padx=(20, 0))
                             break
-    
+
     def update_page(self, current_page):
         self.current_page = current_page
         self.start_index = self.current_page * self.items_per_page
