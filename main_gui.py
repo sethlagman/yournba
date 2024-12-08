@@ -24,11 +24,11 @@ class MainFrame(ctk.CTkFrame):
         sidebar = SideBarFrame(self)
         entry = EntryFrame(self)
         output = OutputFrame(self)
-        pagination = PaginationFrame(self)
+        pagination = PaginationFrame(self, output_frame=output, current_page=output.current_page)
 
 
 class PaginationFrame(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, output_frame, current_page=0):
         super().__init__(master, fg_color='transparent')
         self.grid(column=1, row=3, sticky='ew', padx=(10, 0))
         self.grid_propagate(0)
@@ -36,11 +36,20 @@ class PaginationFrame(ctk.CTkFrame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure((0, 1), weight=1)
 
-        next_btn = ctk.CTkButton(self, text='Next', height=30, width=210)
+        self.output_frame = output_frame
+        self.current_page = current_page
+
+        next_btn = ctk.CTkButton(self, text='Next', height=30, width=210, command=self.next_page)
         next_btn.grid(row=0, column=1, pady=(0, 5))
 
-        previous_btn = ctk.CTkButton(self, text='Previous', height=30, width=210)
+        previous_btn = ctk.CTkButton(self, text='Previous', height=30, width=210, command=self.previous_page)
         previous_btn.grid(row=0, column=0, pady=(0, 5))
+
+    def next_page(self):
+        self.output_frame.update_page(self.output_frame.current_page + 1)
+
+    def previous_page(self):
+        self.output_frame.update_page(self.output_frame.current_page - 1)
 
 
 class SideBarFrame(ctk.CTkFrame):
@@ -90,22 +99,47 @@ class EntryFrame(ctk.CTkFrame):
 
 
 class OutputFrame(ctk.CTkScrollableFrame):
-    def __init__(self, master, data='schedule'):
+    def __init__(self, master, data='schedule', items_per_page=10, current_page=0):
         super().__init__(master, height=650, width=545)
         self.grid(column=1, row=2, sticky='ew', padx=(10, 10), pady=(10, 10))
         self.grid_columnconfigure(0, weight=1)
+        
+        self.data = data
+        self.items_per_page = items_per_page
+        self.current_page = current_page
+        self.start_index = self.current_page * self.items_per_page
+        self.end_index = self.start_index + self.items_per_page
 
-        if data == 'schedule':
+        self.load_page_data()
+
+    def load_page_data(self):
+        if self.data == 'schedule':
             current_date = f'{d.today().month}/0{d.today().day}/{d.today().year}'
-            schedules = NbaSchedule().fetch_shedule()
-            for schedule in schedules[150:200]:
+            schedules = NbaSchedule().fetch_shedule()[self.start_index:self.end_index]
+            for schedule in schedules:
                 for date, games in schedule.items():
-                    date_label = ctk.CTkLabel(self, text=date)
-                    date_label.grid()
+                    date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
+                    date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
                     for game in games:
-                        matchup = f'{game['Home']} vs {game['Away']}'
-                        matchup_label = ctk.CTkLabel(self, text=matchup)
-                        matchup_label.grid()
+                        if game['Home'].strip() and game['Away'].strip():
+                            matchup = f'{game['Home']} vs {game['Away']}'
+                            matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
+                            matchup_label.grid(sticky='w', padx=(20, 0))
+                        else:
+                            matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
+                            matchup_label.grid(sticky='w', padx=(20, 0))
+                            break
+    
+    def update_page(self, current_page):
+        self.current_page = current_page
+        self.start_index = self.current_page * self.items_per_page
+        self.end_index = self.start_index + self.items_per_page
+        self.clear_content()
+        self.load_page_data()
+
+    def clear_content(self):
+        for widget in self.winfo_children():
+            widget.destroy()
 
 
 class App(ctk.CTk):
