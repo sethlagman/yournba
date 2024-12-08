@@ -49,9 +49,9 @@ class NbaSchedule:
             for dates, games in schedules.items():
                 for game in games:
                     if game['gameId'] == gameid:
-                        return {
+                        return [{
                             dates: game
-                        }
+                        }]
 
     def fetch_date_schedule(self, date: str) -> dict:
         """
@@ -67,7 +67,7 @@ class NbaSchedule:
         for schedules in self.fetch_shedule():
             for dates, games in schedules.items():
                 if dates == date:
-                    return {date: games}
+                    return [{date: games}]
 
 
 def main():
