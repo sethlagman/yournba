@@ -1,5 +1,5 @@
 """NBA Schedule"""
-import json
+
 from filehandler import FileHandler
 
 class NbaSchedule:
@@ -45,12 +45,13 @@ class NbaSchedule:
             dict: - Game associated with the id
         """
 
-        for dates, games in self.fetch_shedule().items():
-            for game in games:
-                if game['gameId'] == gameid:
-                    return {
-                        dates: game
-                    }
+        for schedules in self.fetch_shedule():
+            for dates, games in schedules.items():
+                for game in games:
+                    if game['gameId'] == gameid:
+                        return {
+                            dates: game
+                        }
 
     def fetch_date_schedule(self, date: str) -> dict:
         """
@@ -63,9 +64,10 @@ class NbaSchedule:
             dict: - Game matchups for the date 
         """
 
-        for dates, games in self.fetch_shedule().items():
-            if dates == date:
-                return {date: games}
+        for schedules in self.fetch_shedule():
+            for dates, games in schedules.items():
+                if dates == date:
+                    return {date: games}
 
 
 def main():
