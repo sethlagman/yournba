@@ -8,6 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 
 from modules.nba_schedule import *
 from modules.nba_statistics import *
+from modules.filehandler import FileHandler
 
 class MainFrame(ctk.CTkFrame):
     def __init__(self, master):
@@ -23,8 +24,8 @@ class MainFrame(ctk.CTkFrame):
         
         entry = EntryFrame(self)
         output = OutputFrame(self)
-        sidebar = SideBarFrame(self, output_frame=output)
         pagination = PaginationFrame(self, output_frame=output, current_page=output.current_page)
+        sidebar = SideBarFrame(self, output_frame=output, pagination_frame=pagination)
 
 
 class PaginationFrame(ctk.CTkFrame):
@@ -39,21 +40,48 @@ class PaginationFrame(ctk.CTkFrame):
         self.output_frame = output_frame
         self.current_page = current_page
 
-        next_btn = ctk.CTkButton(self, text='Next', height=30, width=210, command=self.next_page)
-        next_btn.grid(row=0, column=1, pady=(0, 5))
+        self.next_btn = ctk.CTkButton(self, text='Next', height=30, width=210, command=self.next_page)
+        self.next_btn.grid(row=0, column=1, pady=(0, 5))
 
-        previous_btn = ctk.CTkButton(self, text='Previous', height=30, width=210, command=self.previous_page)
-        previous_btn.grid(row=0, column=0, pady=(0, 5))
+        self.previous_btn = ctk.CTkButton(self, text='Previous', height=30, width=210, command=self.previous_page)
+        self.previous_btn.grid(row=0, column=0, pady=(0, 5))
+
+        self.update_nextbtn_state(self.output_frame.output)
+        self.update_prevbtn_state()
+
+    def get_length(self, data):
+        if data == 'schedule':
+            return len(NbaSchedule().fetch_shedule())
+        if data == 'statistics':
+            return len(NbaStatistics().statistics)
+        if data == 'game_today':
+            return 0
+
+    def update_nextbtn_state(self, data):
+        if self.output_frame.end_index <= self.get_length(data):
+            self.next_btn.configure(state='normal')
+        elif self.output_frame.end_index >= self.get_length(data):
+            self.next_btn.configure(state='disabled')
+
+    def update_prevbtn_state(self):
+        if self.output_frame.current_page > 0:
+            self.previous_btn.configure(state='normal')
+        elif self.output_frame.current_page <= 0:
+            self.previous_btn.configure(state='disabled')
 
     def next_page(self):
         self.output_frame.update_page(self.output_frame.current_page + 1)
+        self.update_nextbtn_state(self.output_frame.output)
+        self.update_prevbtn_state()
 
     def previous_page(self):
         self.output_frame.update_page(self.output_frame.current_page - 1)
+        self.update_prevbtn_state()
+        self.update_nextbtn_state(self.output_frame.output)
 
 
 class SideBarFrame(ctk.CTkFrame):
-    def __init__(self, master, output_frame):
+    def __init__(self, master, output_frame, pagination_frame):
         super().__init__(master, width=250)
         self.grid(column=0, row=0, rowspan=4, sticky='nsew', padx=(10, 0), pady=(10, 10))
         self.grid_propagate(0)
@@ -64,6 +92,7 @@ class SideBarFrame(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
 
         self.output_frame = output_frame
+        self.pagination_frame = pagination_frame
 
         title = ctk.CTkLabel(self, text='Menu', font=('', 30, 'bold'))
         title.grid(column=0, row=0, sticky='n', pady=(30, 15))
@@ -76,9 +105,13 @@ class SideBarFrame(ctk.CTkFrame):
 
     def update_output_to_schedule(self):
         self.output_frame.update_output('schedule')
+        self.pagination_frame.update_nextbtn_state(self.output_frame.output)
+        self.pagination_frame.update_prevbtn_state()
 
     def update_output_to_statistics(self):
         self.output_frame.update_output('statistics')
+        self.pagination_frame.update_nextbtn_state(self.output_frame.output)
+        self.pagination_frame.update_prevbtn_state()
 
 
 class EntryFrame(ctk.CTkFrame):
