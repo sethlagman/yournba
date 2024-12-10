@@ -52,20 +52,24 @@ class PaginationFrame(ctk.CTkFrame):
     def get_length(self, data):
         if data == 'schedule':
             return len(NbaSchedule().fetch_shedule())
+        
         if data == 'statistics':
             return len(NbaStatistics().statistics)
+        
         if data == 'game_today':
             return 0
 
     def update_nextbtn_state(self, data):
         if self.output_frame.end_index <= self.get_length(data):
             self.next_btn.configure(state='normal')
+
         elif self.output_frame.end_index >= self.get_length(data):
             self.next_btn.configure(state='disabled')
 
     def update_prevbtn_state(self):
         if self.output_frame.current_page > 0:
             self.previous_btn.configure(state='normal')
+
         elif self.output_frame.current_page <= 0:
             self.previous_btn.configure(state='disabled')
 
@@ -124,19 +128,20 @@ class EntryFrame(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=5)
         self.grid_columnconfigure(2, weight=1)
 
-        self.optionmenu_var = ctk.StringVar(value='Date')
-        optionmenu = ctk.CTkOptionMenu(self, values=['Date', 'Player', 'Game Id'], height=31, command=self.optionmenu_callback, variable=self.optionmenu_var)
-        optionmenu.grid(row=1, column=0)
+        self.optionmenu = ctk.CTkOptionMenu(self, values=['Date', 'Player', 'Game Id'], height=31, command=self.optionmenu_callback)
+        self.optionmenu.grid(row=1, column=0)
 
-        self.search = ctk.CTkEntry(self, placeholder_text=f'Search for {self.optionmenu_var.get()}', height=30)
+        self.search = ctk.CTkEntry(self, placeholder_text=f'Search for {self.optionmenu.get()}', height=30)
         self.search.grid(row=1, column=1, sticky='ew', padx=(0, 10))
 
-        search_btn = ctk.CTkButton(self, text='Search', height=30, width=50)
+        search_btn = ctk.CTkButton(self, text='Search', height=30, width=50, command=self.get_entry)
         search_btn.grid(row=1,column=2, sticky='ew', padx=(5, 20))
     
+    def get_entry(self):
+        return {'entry': self.search.get(), 'option': self.optionmenu.get()}
+
     def optionmenu_callback(self, choice):
-            self.search.configure(placeholder_text=f'Search for {choice}')
-            return choice
+        self.search.configure(placeholder_text=f'Search for {choice}')
 
 
 class OutputFrame(ctk.CTkScrollableFrame):
@@ -160,17 +165,20 @@ class OutputFrame(ctk.CTkScrollableFrame):
 
     def load_page_data(self):
         if self.output == 'game_today':
-            current_date = f'{d.today().month}/0{d.today().day}/{d.today().year}'
+            current_date = d.today().strftime('%m/%d/%Y')
             schedules = NbaSchedule().fetch_date_schedule(current_date)
             for schedule in schedules:
+
                 for date, games in schedule.items():
                     date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
                     date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+
                     for game in games:
                         if game['Home'].strip() and game['Away'].strip():
                             matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
                             matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
                             matchup_label.grid(sticky='w', padx=(20, 0))
+                            
                         else:
                             matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
                             matchup_label.grid(sticky='w', padx=(20, 0))
@@ -179,18 +187,47 @@ class OutputFrame(ctk.CTkScrollableFrame):
         elif self.output == 'schedule':
             schedules = NbaSchedule().fetch_shedule()[self.start_index:self.end_index]
             for schedule in schedules:
+
                 for date, games in schedule.items():
                     date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
                     date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+
                     for game in games:
                         if game['Home'].strip() and game['Away'].strip():
                             matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
                             matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
                             matchup_label.grid(sticky='w', padx=(20, 0))
+
                         else:
                             matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
                             matchup_label.grid(sticky='w', padx=(20, 0))
                             break
+
+        elif self.output == 'statistics':
+            statistics = NbaStatistics().statistics[self.start_index:self.end_index]
+            for statistic in statistics:
+
+                player, team, position = statistic['name'],  statistic['team'], statistic['position']
+                pointspergame, assistspergame = statistic['ppg'], statistic['apg']
+                stealspergame, blockspergame, turnoverspergame = statistic['spg'], statistic['bpg'], statistic['tpg']
+
+                player_label = ctk.CTkLabel(self, text=player, font=('', 15, 'bold'))
+                team_label = ctk.CTkLabel(self, text=f'   Team: {team}')
+                position_label = ctk.CTkLabel(self, text=f'   Position: {position}')
+                ppg_label = ctk.CTkLabel(self, text=f'   Points per game: {pointspergame}')
+                apg_label = ctk.CTkLabel(self, text=f'   Assists per game: {assistspergame}')
+                spg_label = ctk.CTkLabel(self, text=f'   Steals per game: {stealspergame}')
+                bpg_label = ctk.CTkLabel(self, text=f'   Blocks per game: {blockspergame}')
+                tpg_label = ctk.CTkLabel(self, text=f'   Turnovers per game: {turnoverspergame}')
+
+                player_label.grid(sticky='w')
+                team_label.grid(sticky='w')
+                position_label.grid(sticky='w')
+                ppg_label.grid(sticky='w')
+                apg_label.grid(sticky='w')
+                spg_label.grid(sticky='w')
+                bpg_label.grid(sticky='w')
+                tpg_label.grid(sticky='w')
 
     def update_page(self, current_page):
         self.current_page = current_page
