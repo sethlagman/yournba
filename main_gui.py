@@ -1,14 +1,14 @@
-from datetime import date as d
 import customtkinter as ctk
-from tkinter import messagebox
 import sys
 import os
+
+from datetime import date as d
+from tkinter import messagebox
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 
 from modules.nba_schedule import *
 from modules.nba_statistics import *
-from modules.filehandler import FileHandler
 
 class MainFrame(ctk.CTkFrame):
     def __init__(self, master):
@@ -49,6 +49,7 @@ class PaginationFrame(ctk.CTkFrame):
         self.update_nextbtn_state(self.output_frame.output)
         self.update_prevbtn_state()
 
+
     def get_length(self, data):
         if data == 'schedule':
             return len(NbaSchedule().fetch_shedule())
@@ -59,12 +60,14 @@ class PaginationFrame(ctk.CTkFrame):
         if data == 'game_today':
             return 0
 
+
     def update_nextbtn_state(self, data):
         if self.output_frame.end_index <= self.get_length(data):
             self.next_btn.configure(state='normal')
 
         elif self.output_frame.end_index >= self.get_length(data):
             self.next_btn.configure(state='disabled')
+
 
     def update_prevbtn_state(self):
         if self.output_frame.current_page > 0:
@@ -73,10 +76,12 @@ class PaginationFrame(ctk.CTkFrame):
         elif self.output_frame.current_page <= 0:
             self.previous_btn.configure(state='disabled')
 
+
     def next_page(self):
         self.output_frame.update_page(self.output_frame.current_page + 1)
         self.update_nextbtn_state(self.output_frame.output)
         self.update_prevbtn_state()
+
 
     def previous_page(self):
         self.output_frame.update_page(self.output_frame.current_page - 1)
@@ -107,10 +112,12 @@ class SideBarFrame(ctk.CTkFrame):
         statistics_btn = ctk.CTkButton(self, text='Statistics', height=35, width=150, command=self.update_output_to_statistics)
         statistics_btn.grid(column=0, row=2, pady=(20, 30))
 
+
     def update_output_to_schedule(self):
         self.output_frame.update_output('schedule')
         self.pagination_frame.update_nextbtn_state(self.output_frame.output)
         self.pagination_frame.update_prevbtn_state()
+
 
     def update_output_to_statistics(self):
         self.output_frame.update_output('statistics')
@@ -139,12 +146,15 @@ class EntryFrame(ctk.CTkFrame):
         search_btn = ctk.CTkButton(self, text='Search', height=30, width=50, command=self.get_entry)
         search_btn.grid(row=1,column=2, sticky='ew', padx=(5, 20))
     
+
     def get_entry(self):
         self.output_frame.update_output(self.optionmenu.get().lower(), self.search.get())
+
 
     def optionmenu_callback(self, choice):
         if choice == 'Date':
             self.search.configure(placeholder_text=f'Search for {choice} (MM/DD/YY)')
+
         else:
             self.search.configure(placeholder_text=f'Search for {choice}')
 
@@ -163,23 +173,28 @@ class OutputFrame(ctk.CTkScrollableFrame):
 
         self.load_page_data()
 
+
     def update_output(self, output, entry=''):
         self.output = output
         self.entry = entry
         self.clear_content()
         self.load_page_data()
 
+
     def load_page_data(self):
         if self.output == 'game_today':
             current_date = d.today().strftime('%m/%d/%Y')
             schedules = NbaSchedule().fetch_date_schedule(current_date)
+
             for schedule in schedules:
 
                 for date, games in schedule.items():
+
                     date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
                     date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
 
                     for game in games:
+
                         if game['Home'].strip() and game['Away'].strip():
                             matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
                             matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
@@ -190,15 +205,19 @@ class OutputFrame(ctk.CTkScrollableFrame):
                             matchup_label.grid(sticky='w', padx=(20, 0))
                             break
 
+
         elif self.output == 'schedule':
             schedules = NbaSchedule().fetch_shedule()[self.start_index:self.end_index]
+
             for schedule in schedules:
 
                 for date, games in schedule.items():
+
                     date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
                     date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
 
                     for game in games:
+
                         if game['Home'].strip() and game['Away'].strip():
                             matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
                             matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
@@ -209,10 +228,11 @@ class OutputFrame(ctk.CTkScrollableFrame):
                             matchup_label.grid(sticky='w', padx=(20, 0))
                             break
 
+
         elif self.output == 'statistics':
             statistics = NbaStatistics().statistics[self.start_index:self.end_index]
-            for statistic in statistics:
 
+            for statistic in statistics:
                 player, team, position = statistic['name'],  statistic['team'], statistic['position']
                 pointspergame, assistspergame = statistic['ppg'], statistic['apg']
                 stealspergame, blockspergame, turnoverspergame = statistic['spg'], statistic['bpg'], statistic['tpg']
@@ -234,35 +254,45 @@ class OutputFrame(ctk.CTkScrollableFrame):
                 spg_label.grid(sticky='w')
                 bpg_label.grid(sticky='w')
                 tpg_label.grid(sticky='w')
+
 
         elif self.output == 'date':
             schedules = NbaSchedule().fetch_date_schedule(self.entry)
             try:
                 for schedule in schedules:
+
                     for date, games in schedule.items():
+
                         date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
                         date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+
                         for game in games:
                             if game['Home'].strip() and game['Away'].strip():
                                 matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
                                 matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
                                 matchup_label.grid(sticky='w', padx=(20, 0))
+
                             else:
                                 matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
                                 matchup_label.grid(sticky='w', padx=(20, 0))
                                 break
+
             except Exception:
                 matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
                 matchup_label.grid(sticky='w', padx=(20, 0))
 
+
         elif self.output == 'player':
             try:
                 first, last = self.entry.split()
+
             except Exception:
                 matchup_label = ctk.CTkLabel(self, text='Player not found', font=('', 17))
                 matchup_label.grid(sticky='w', padx=(20, 0))
+
             else:
                 statistic = NbaStatistics().fetch_player_statistics(first, last)
+
                 player, team, position = statistic['name'],  statistic['team'], statistic['position']
                 pointspergame, assistspergame = statistic['ppg'], statistic['apg']
                 stealspergame, blockspergame, turnoverspergame = statistic['spg'], statistic['bpg'], statistic['tpg']
@@ -285,27 +315,35 @@ class OutputFrame(ctk.CTkScrollableFrame):
                 bpg_label.grid(sticky='w')
                 tpg_label.grid(sticky='w')
 
+
         elif self.output == 'game id':
             try:
                 schedules = NbaSchedule().fetch_id_schedule(self.entry)
+
                 for schedule in schedules:
+
                     for date, game in schedule.items():
+
                         date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
                         date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+
                         if game['Home'].strip() and game['Away'].strip():
                             matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
                             matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
                             matchup_label.grid(sticky='w', padx=(20, 0))
+
             except Exception:
                 matchup_label = ctk.CTkLabel(self, text='Game not found', font=('', 17))
                 matchup_label.grid(sticky='w', padx=(20, 0))
                 
+
     def update_page(self, current_page):
         self.current_page = current_page
         self.start_index = self.current_page * self.items_per_page
         self.end_index = self.start_index + self.items_per_page
         self.clear_content()
         self.load_page_data()
+
 
     def clear_content(self):
         for widget in self.winfo_children():
@@ -326,8 +364,10 @@ class App(ctk.CTk):
 
         mainframe = MainFrame(self)
 
+
     def exit_app(self):
         confirm = messagebox.askyesno('', 'Are you sure you want to close the application?')
+
         if confirm:
             self.quit()
 
