@@ -17,7 +17,7 @@ class FileHandler:
         """Stores the file"""
         
         if filename is None:
-            with open(self.endpoint + '.json', 'w') as file:
+            with open(f'nba_data/{self.endpoint}.json', 'w') as file:
                 file.write(json.dumps(self.response.json(), indent=2))
         else:
             with open(filename, 'w') as file:
