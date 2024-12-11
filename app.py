@@ -24,12 +24,12 @@ class MainFrame(ctk.CTkFrame):
         
         output = OutputFrame(self)
         entry = EntryFrame(self, output_frame=output)
-        pagination = PaginationFrame(self, output_frame=output, current_page=output.current_page)
+        pagination = PaginationFrame(self, output_frame=output)
         sidebar = SideBarFrame(self, output_frame=output, pagination_frame=pagination)
 
 
 class PaginationFrame(ctk.CTkFrame):
-    def __init__(self, master, output_frame, current_page=0):
+    def __init__(self, master, output_frame):
         super().__init__(master, fg_color='transparent')
         self.grid(column=1, row=3, sticky='ew', padx=(10, 0))
         self.grid_propagate(0)
@@ -38,7 +38,6 @@ class PaginationFrame(ctk.CTkFrame):
         self.grid_columnconfigure((0, 1), weight=1)
 
         self.output_frame = output_frame
-        self.current_page = current_page
 
         self.next_btn = ctk.CTkButton(self, text='Next', height=30, width=210, command=self.next_page)
         self.next_btn.grid(row=0, column=1, pady=(0, 5))
@@ -114,12 +113,14 @@ class SideBarFrame(ctk.CTkFrame):
 
 
     def update_output_to_schedule(self):
+        
         self.output_frame.update_output('schedule')
         self.pagination_frame.update_nextbtn_state(self.output_frame.output)
         self.pagination_frame.update_prevbtn_state()
 
 
     def update_output_to_statistics(self):
+        
         self.output_frame.update_output('statistics')
         self.pagination_frame.update_nextbtn_state(self.output_frame.output)
         self.pagination_frame.update_prevbtn_state()
@@ -171,13 +172,6 @@ class OutputFrame(ctk.CTkScrollableFrame):
         self.start_index = self.current_page * self.items_per_page
         self.end_index = self.start_index + self.items_per_page
 
-        self.load_page_data()
-
-
-    def update_output(self, output, entry=''):
-        self.output = output
-        self.entry = entry
-        self.clear_content()
         self.load_page_data()
 
 
@@ -257,7 +251,7 @@ class OutputFrame(ctk.CTkScrollableFrame):
 
 
         elif self.output == 'date':
-            schedules = NbaSchedule().fetch_date_schedule(self.entry)
+            schedules = NbaSchedule().fetch_date_schedule(self.entry.strip())
             try:
                 for schedule in schedules:
 
@@ -277,14 +271,14 @@ class OutputFrame(ctk.CTkScrollableFrame):
                                 matchup_label.grid(sticky='w', padx=(20, 0))
                                 break
 
-            except Exception:
+            except Exception as e:
                 matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
                 matchup_label.grid(sticky='w', padx=(20, 0))
 
 
         elif self.output == 'player':
             try:
-                first, last = self.entry.split()
+                first, last = self.entry.strip().split()
 
             except Exception:
                 matchup_label = ctk.CTkLabel(self, text='Player not found', font=('', 17))
@@ -318,7 +312,7 @@ class OutputFrame(ctk.CTkScrollableFrame):
 
         elif self.output == 'game id':
             try:
-                schedules = NbaSchedule().fetch_id_schedule(self.entry)
+                schedules = NbaSchedule().fetch_id_schedule(self.entry.strip())
 
                 for schedule in schedules:
 
@@ -343,6 +337,12 @@ class OutputFrame(ctk.CTkScrollableFrame):
         self.end_index = self.start_index + self.items_per_page
         self.clear_content()
         self.load_page_data()
+
+
+    def update_output(self, output, entry=''):
+        self.output = output
+        self.entry = entry
+        self.update_page(0)
 
 
     def clear_content(self):
