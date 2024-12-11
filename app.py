@@ -4,6 +4,8 @@ import os
 
 from datetime import date as d
 from tkinter import messagebox
+from nba_scraper.nba_scraper.spiders.nba_spider import NbaScraperSpider
+from scrapy.crawler import CrawlerProcess
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 
@@ -362,7 +364,25 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
+        FileHandler('schedule').store()
+        self.run_spider(NbaScraperSpider)
+
         mainframe = MainFrame(self)
+
+
+    def run_spider(self, spider):
+        os.remove('nba_data/statistics.json')
+        
+        process = CrawlerProcess(
+        settings={
+            "FEEDS": {
+                "nba_data/statistics.json": {"format": "json"},
+                },
+            }
+        )
+
+        process.crawl(spider)
+        process.start()
 
 
     def exit_app(self):
