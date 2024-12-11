@@ -1,5 +1,4 @@
 import scrapy
-from scrapy.crawler import CrawlerProcess
 
 class NbaScraperSpider(scrapy.Spider):
     name = 'nbascraper'
@@ -37,15 +36,3 @@ class NbaScraperSpider(scrapy.Spider):
                 'ortg': row.css('.column-27::text').get(),  # Get the player's offensive rating
             }
             yield data
-
-
-process = CrawlerProcess(
-    settings={
-        "FEEDS": {
-            "nba_data/statistics.json": {"format": "json"},
-        },
-    }
-)
-
-process.crawl(NbaScraperSpider)
-process.start()
