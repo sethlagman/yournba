@@ -22,8 +22,8 @@ class MainFrame(ctk.CTkFrame):
         title = ctk.CTkLabel(self, text='YourNBA', font=('', 50, 'bold'))
         title.grid(column=1, row=0, pady=(20, 15))
         
-        entry = EntryFrame(self)
         output = OutputFrame(self)
+        entry = EntryFrame(self, output_frame=output)
         pagination = PaginationFrame(self, output_frame=output, current_page=output.current_page)
         sidebar = SideBarFrame(self, output_frame=output, pagination_frame=pagination)
 
@@ -119,7 +119,7 @@ class SideBarFrame(ctk.CTkFrame):
 
 
 class EntryFrame(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, output_frame):
         super().__init__(master, fg_color='transparent')
         self.grid(column=1, row=1, sticky='new')
         self.grid_propagate(0)
@@ -128,20 +128,25 @@ class EntryFrame(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=5)
         self.grid_columnconfigure(2, weight=1)
 
+        self.output_frame = output_frame
+
         self.optionmenu = ctk.CTkOptionMenu(self, values=['Date', 'Player', 'Game Id'], height=31, command=self.optionmenu_callback)
         self.optionmenu.grid(row=1, column=0)
 
-        self.search = ctk.CTkEntry(self, placeholder_text=f'Search for {self.optionmenu.get()}', height=30)
+        self.search = ctk.CTkEntry(self, placeholder_text=f'Search for {self.optionmenu.get()} (MM/DD/YYYY)', height=30)
         self.search.grid(row=1, column=1, sticky='ew', padx=(0, 10))
 
         search_btn = ctk.CTkButton(self, text='Search', height=30, width=50, command=self.get_entry)
         search_btn.grid(row=1,column=2, sticky='ew', padx=(5, 20))
     
     def get_entry(self):
-        return {'entry': self.search.get(), 'option': self.optionmenu.get()}
+        self.output_frame.update_output(self.optionmenu.get().lower(), self.search.get())
 
     def optionmenu_callback(self, choice):
-        self.search.configure(placeholder_text=f'Search for {choice}')
+        if choice == 'Date':
+            self.search.configure(placeholder_text=f'Search for {choice} (MM/DD/YY)')
+        else:
+            self.search.configure(placeholder_text=f'Search for {choice}')
 
 
 class OutputFrame(ctk.CTkScrollableFrame):
@@ -158,8 +163,9 @@ class OutputFrame(ctk.CTkScrollableFrame):
 
         self.load_page_data()
 
-    def update_output(self, output):
+    def update_output(self, output, entry=''):
         self.output = output
+        self.entry = entry
         self.clear_content()
         self.load_page_data()
 
@@ -229,6 +235,71 @@ class OutputFrame(ctk.CTkScrollableFrame):
                 bpg_label.grid(sticky='w')
                 tpg_label.grid(sticky='w')
 
+        elif self.output == 'date':
+            schedules = NbaSchedule().fetch_date_schedule(self.entry)
+            try:
+                for schedule in schedules:
+                    for date, games in schedule.items():
+                        date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
+                        date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+                        for game in games:
+                            if game['Home'].strip() and game['Away'].strip():
+                                matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
+                                matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
+                                matchup_label.grid(sticky='w', padx=(20, 0))
+                            else:
+                                matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
+                                matchup_label.grid(sticky='w', padx=(20, 0))
+                                break
+            except Exception:
+                matchup_label = ctk.CTkLabel(self, text='No matchup for this date', font=('', 17))
+                matchup_label.grid(sticky='w', padx=(20, 0))
+
+        elif self.output == 'player':
+            try:
+                first, last = self.entry.split()
+            except Exception:
+                matchup_label = ctk.CTkLabel(self, text='Player not found', font=('', 17))
+                matchup_label.grid(sticky='w', padx=(20, 0))
+            else:
+                statistic = NbaStatistics().fetch_player_statistics(first, last)
+                player, team, position = statistic['name'],  statistic['team'], statistic['position']
+                pointspergame, assistspergame = statistic['ppg'], statistic['apg']
+                stealspergame, blockspergame, turnoverspergame = statistic['spg'], statistic['bpg'], statistic['tpg']
+
+                player_label = ctk.CTkLabel(self, text=player, font=('', 15, 'bold'))
+                team_label = ctk.CTkLabel(self, text=f'   Team: {team}')
+                position_label = ctk.CTkLabel(self, text=f'   Position: {position}')
+                ppg_label = ctk.CTkLabel(self, text=f'   Points per game: {pointspergame}')
+                apg_label = ctk.CTkLabel(self, text=f'   Assists per game: {assistspergame}')
+                spg_label = ctk.CTkLabel(self, text=f'   Steals per game: {stealspergame}')
+                bpg_label = ctk.CTkLabel(self, text=f'   Blocks per game: {blockspergame}')
+                tpg_label = ctk.CTkLabel(self, text=f'   Turnovers per game: {turnoverspergame}')
+
+                player_label.grid(sticky='w')
+                team_label.grid(sticky='w')
+                position_label.grid(sticky='w')
+                ppg_label.grid(sticky='w')
+                apg_label.grid(sticky='w')
+                spg_label.grid(sticky='w')
+                bpg_label.grid(sticky='w')
+                tpg_label.grid(sticky='w')
+
+        elif self.output == 'game id':
+            try:
+                schedules = NbaSchedule().fetch_id_schedule(self.entry)
+                for schedule in schedules:
+                    for date, game in schedule.items():
+                        date_label = ctk.CTkLabel(self, text=date, font=('', 18, 'bold', 'underline'))
+                        date_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+                        if game['Home'].strip() and game['Away'].strip():
+                            matchup = f'{game['Home']} vs {game['Away']} | {game['gameTime']}'
+                            matchup_label = ctk.CTkLabel(self, text=matchup, font=('', 17))
+                            matchup_label.grid(sticky='w', padx=(20, 0))
+            except Exception:
+                matchup_label = ctk.CTkLabel(self, text='Game not found', font=('', 17))
+                matchup_label.grid(sticky='w', padx=(20, 0))
+                
     def update_page(self, current_page):
         self.current_page = current_page
         self.start_index = self.current_page * self.items_per_page
