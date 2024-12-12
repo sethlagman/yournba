@@ -13,12 +13,17 @@ class FileHandler:
         if endpoint:
             self.response = requests.get(json.load(open(r'nba_data\endpoints.json'))['endpoints'][endpoint])
 
-    def store(self, filename=None):
+    def store(self, filename=None, data=None):
         """Stores the file"""
         
-        if filename is None:
+        if not filename:
             with open(f'nba_data/{self.endpoint}.json', 'w') as file:
                 file.write(json.dumps(self.response.json(), indent=2))
+
+        elif filename and data:
+            with open(filename, 'w') as file:
+                file.write(json.dumps(data, indent=2))
+
         else:
             with open(filename, 'w') as file:
                 file.write(json.dumps(self.response.json(), indent=2))
@@ -26,9 +31,10 @@ class FileHandler:
     def read(self, filename=None):
         """Reads the file"""
 
-        if filename is None:
+        if not filename:
             with open(self.endpoint + '.json', 'r') as file:
                 return json.load(file)
+            
         else:
             with open(filename, 'r') as file:
                 return json.load(file)
