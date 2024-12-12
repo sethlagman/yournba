@@ -4,8 +4,10 @@ import os
 
 from datetime import date as d
 from tkinter import messagebox
+from PIL import Image, ImageTk
 from nba_scraper.nba_scraper.spiders.nba_spider import NbaScraperSpider
 from scrapy.crawler import CrawlerProcess
+from webbrowser import open as openbrowser
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 
@@ -96,33 +98,81 @@ class SideBarFrame(ctk.CTkFrame):
         self.grid(column=0, row=0, rowspan=4, sticky='nsew', padx=(10, 0), pady=(10, 10))
         self.grid_propagate(0)
 
-        self.grid_rowconfigure(0, weight=0)
-        self.grid_rowconfigure(1, weight=0)
-        self.grid_rowconfigure(2, weight=0)
+        self.grid_rowconfigure((0, 1, 2, 3), weight=0)
+        self.grid_rowconfigure(4, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
         self.output_frame = output_frame
         self.pagination_frame = pagination_frame
 
         title = ctk.CTkLabel(self, text='Menu', font=('', 30, 'bold'))
-        title.grid(column=0, row=0, sticky='n', pady=(30, 15))
+        title.grid(column=0, row=0, sticky='n', pady=(30, 95))
+
+        game_today_btn = ctk.CTkButton(self, text='Game Today', height=35, width=150, command=self.update_output_to_game_today)
+        game_today_btn.grid(column=0, row=1, pady=(20, 30))
 
         schedules_btn = ctk.CTkButton(self, text='Schedule', height=35, width=150, command=self.update_output_to_schedule)
-        schedules_btn.grid(column=0, row=1, pady=(30, 30))
+        schedules_btn.grid(column=0, row=2, pady=(20, 30))
 
         statistics_btn = ctk.CTkButton(self, text='Statistics', height=35, width=150, command=self.update_output_to_statistics)
-        statistics_btn.grid(column=0, row=2, pady=(20, 30))
+        statistics_btn.grid(column=0, row=3, pady=(20, 30))
+
+        github_img = ctk.CTkImage(Image.open('images/githublogo.png').resize((35, 35)))
+        github_btn = ctk.CTkButton(
+            self,
+            command=self.open_github,
+            image=github_img,
+            width=40,
+            height=40,
+            border_width=1,
+            fg_color='#FFFFFF',
+            text_color='#C0C0C0',
+            border_color='#404040',
+            anchor='center',
+            text='',
+            hover_color='#FFFFFF'
+        )
+        github_btn.grid(column=0, row=4, sticky='se', pady=(0, 50), padx=(0, 60))
+
+        githubrepo_img = ctk.CTkImage(Image.open('images/githubrepo.png').resize((35, 35)))
+        githubrepo_btn = ctk.CTkButton(
+            self,
+            command=self.open_github_repo,
+            image=githubrepo_img,
+            width=40,
+            height=40,
+            border_width=1,
+            fg_color='#FFFFFF',
+            text_color='#C0C0C0',
+            border_color='#404040',
+            anchor='center',
+            text='',
+            hover_color='#FFFFFF'
+        )
+        githubrepo_btn.grid(column=0, row=4, sticky='sw', pady=(0, 50), padx=(60, 0))
+
+
+    def open_github(self):
+        openbrowser('https://github.com/sethlagman')
+
+
+    def open_github_repo(self):
+        openbrowser('https://github.com/sethlagman/yournba')
+
+
+    def update_output_to_game_today(self):
+        self.output_frame.update_output('game_today')
+        self.pagination_frame.update_nextbtn_state(self.output_frame.output)
+        self.pagination_frame.update_prevbtn_state()
 
 
     def update_output_to_schedule(self):
-        
         self.output_frame.update_output('schedule')
         self.pagination_frame.update_nextbtn_state(self.output_frame.output)
         self.pagination_frame.update_prevbtn_state()
 
 
     def update_output_to_statistics(self):
-        
         self.output_frame.update_output('statistics')
         self.pagination_frame.update_nextbtn_state(self.output_frame.output)
         self.pagination_frame.update_prevbtn_state()
@@ -242,14 +292,14 @@ class OutputFrame(ctk.CTkScrollableFrame):
                 bpg_label = ctk.CTkLabel(self, text=f'   Blocks per game: {blockspergame}')
                 tpg_label = ctk.CTkLabel(self, text=f'   Turnovers per game: {turnoverspergame}')
 
-                player_label.grid(sticky='w')
-                team_label.grid(sticky='w')
-                position_label.grid(sticky='w')
-                ppg_label.grid(sticky='w')
-                apg_label.grid(sticky='w')
-                spg_label.grid(sticky='w')
-                bpg_label.grid(sticky='w')
-                tpg_label.grid(sticky='w')
+                player_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+                team_label.grid(sticky='w', padx=(20, 0))
+                position_label.grid(sticky='w', padx=(20, 0))
+                ppg_label.grid(sticky='w', padx=(20, 0))
+                apg_label.grid(sticky='w', padx=(20, 0))
+                spg_label.grid(sticky='w', padx=(20, 0))
+                bpg_label.grid(sticky='w', padx=(20, 0))
+                tpg_label.grid(sticky='w', padx=(20, 0))
 
 
         elif self.output == 'date':
@@ -302,14 +352,14 @@ class OutputFrame(ctk.CTkScrollableFrame):
                 bpg_label = ctk.CTkLabel(self, text=f'   Blocks per game: {blockspergame}')
                 tpg_label = ctk.CTkLabel(self, text=f'   Turnovers per game: {turnoverspergame}')
 
-                player_label.grid(sticky='w')
-                team_label.grid(sticky='w')
-                position_label.grid(sticky='w')
-                ppg_label.grid(sticky='w')
-                apg_label.grid(sticky='w')
-                spg_label.grid(sticky='w')
-                bpg_label.grid(sticky='w')
-                tpg_label.grid(sticky='w')
+                player_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+                team_label.grid(sticky='w', padx=(20, 0))
+                position_label.grid(sticky='w', padx=(20, 0))
+                ppg_label.grid(sticky='w', padx=(20, 0))
+                apg_label.grid(sticky='w', padx=(20, 0))
+                spg_label.grid(sticky='w', padx=(20, 0))
+                bpg_label.grid(sticky='w', padx=(20, 0))
+                tpg_label.grid(sticky='w', padx=(20, 0))
 
 
         elif self.output == 'game id':
@@ -359,18 +409,23 @@ class App(ctk.CTk):
         self.iconbitmap(r'images\nbalogo.ico')
         self.resizable(False, False)
         self.title('')
-        #self.protocol('WM_DELETE_WINDOW', self.exit_app)
+        self.protocol('WM_DELETE_WINDOW', self.exit_app)
         
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        FileHandler('schedule').store()
-        self.run_spider(NbaScraperSpider)
+        self.scrape_log = FileHandler().read('nba_data/log.json')
 
-        mainframe = MainFrame(self)
+        if self.scrape_log != str(d.today()):
+            FileHandler('schedule').store()
+            self.run_spider(NbaScraperSpider)
+
+        self.mainframe = MainFrame(self)
 
 
     def run_spider(self, spider):
+        FileHandler().store(filename='nba_data/log.json', data=str(d.today()))
+
         os.remove('nba_data/statistics.json')
         
         process = CrawlerProcess(
