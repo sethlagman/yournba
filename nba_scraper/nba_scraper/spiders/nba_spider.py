@@ -36,3 +36,22 @@ class NbaScraperSpider(scrapy.Spider):
                 'ortg': row.css('.column-27::text').get(),  # Get the player's offensive rating
             }
             yield data
+
+
+class NbaTeamScraperSpider(scrapy.Spider):
+    name = 'nbateamscraper'
+    start_urls = ['https://www.nbastuffer.com/2024-2025-nba-team-stats/']
+
+    def parse(self, response):
+        rows = response.css('#tablepress-122 tbody tr')
+        for row in rows:
+            data = {
+                'team': row.css('a::text').get(),
+                'conference': row.css('.column-3::text').get(),
+                'wins': row.css('.column-18::text').get(),
+                'losses': row.css('.column-19::text').get(),
+                'winrate': row.css('.column-20::text').get(),
+                'streak': row.css('.column-24::text').get(),
+                'games_played': row.css('.column-5::text').get(),
+            }
+            yield data
