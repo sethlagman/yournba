@@ -33,11 +33,6 @@ class FileHandler:
             with open(filename, 'r') as file:
                 return json.load(file)
 
-    def update(self):
-        """Regularly updates the file given a time interval"""
-
-        pass
-
 
 def main():
     pass
