@@ -13,7 +13,7 @@ class NbaTeam:
     def fetch_team_standing(self, team):
 
         for standing in self.teams:
-            if standing['team'] == team:
+            if team in standing['team'].lower().split() or team == standing['team'].lower():
                 return standing
             
     def fetch_eastern_conference_teams(self):
@@ -65,7 +65,7 @@ class NbaTeam:
 
 
 def main():
-    pass
+    print(NbaTeam().fetch_team_standing('oklahoma city'))
 
 if __name__ == '__main__':
     main()
