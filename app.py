@@ -13,6 +13,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
 
 from modules.nba_schedule import *
 from modules.nba_statistics import *
+from modules.nba_teams import *
 
 class MainFrame(ctk.CTkFrame):
     def __init__(self, master):
@@ -60,6 +61,9 @@ class PaginationFrame(ctk.CTkFrame):
         if data == 'statistics':
             return len(NbaStatistics().statistics)
         
+        if data == 'teams':
+            return 0
+        
         if data == 'game_today':
             return 0
 
@@ -98,8 +102,8 @@ class SideBarFrame(ctk.CTkFrame):
         self.grid(column=0, row=0, rowspan=4, sticky='nsew', padx=(10, 0), pady=(10, 10))
         self.grid_propagate(0)
 
-        self.grid_rowconfigure((0, 1, 2, 3), weight=0)
-        self.grid_rowconfigure(4, weight=1)
+        self.grid_rowconfigure((0, 1, 2, 3, 4), weight=0)
+        self.grid_rowconfigure(5, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
         self.output_frame = output_frame
@@ -117,6 +121,9 @@ class SideBarFrame(ctk.CTkFrame):
         statistics_btn = ctk.CTkButton(self, text='Statistics', height=35, width=150, command=self.update_output_to_statistics)
         statistics_btn.grid(column=0, row=3, pady=(20, 30))
 
+        teams_btn = ctk.CTkButton(self, text='Teams', height=35, width=150, command=self.update_output_to_teams)
+        teams_btn.grid(column=0, row=4, pady=(20, 30))
+
         github_img = ctk.CTkImage(Image.open('images/githublogo.png').resize((35, 35)))
         github_btn = ctk.CTkButton(
             self,
@@ -132,7 +139,7 @@ class SideBarFrame(ctk.CTkFrame):
             text='',
             hover_color='#FFFFFF'
         )
-        github_btn.grid(column=0, row=4, sticky='se', pady=(0, 50), padx=(0, 60))
+        github_btn.grid(column=0, row=5, sticky='se', pady=(0, 50), padx=(0, 60))
 
         githubrepo_img = ctk.CTkImage(Image.open('images/githubrepo.png').resize((35, 35)))
         githubrepo_btn = ctk.CTkButton(
@@ -149,7 +156,7 @@ class SideBarFrame(ctk.CTkFrame):
             text='',
             hover_color='#FFFFFF'
         )
-        githubrepo_btn.grid(column=0, row=4, sticky='sw', pady=(0, 50), padx=(60, 0))
+        githubrepo_btn.grid(column=0, row=5, sticky='sw', pady=(0, 50), padx=(60, 0))
 
 
     def open_github(self):
@@ -158,6 +165,12 @@ class SideBarFrame(ctk.CTkFrame):
 
     def open_github_repo(self):
         openbrowser('https://github.com/sethlagman/yournba')
+
+
+    def update_output_to_teams(self):
+        self.output_frame.update_output('teams')
+        self.pagination_frame.update_nextbtn_state(self.output_frame.output)
+        self.pagination_frame.update_prevbtn_state()
 
 
     def update_output_to_game_today(self):
@@ -279,6 +292,7 @@ class OutputFrame(ctk.CTkScrollableFrame):
             statistics = NbaStatistics().statistics[self.start_index:self.end_index]
 
             for statistic in statistics:
+
                 player, team, position = statistic['name'],  statistic['team'], statistic['position']
                 pointspergame, assistspergame = statistic['ppg'], statistic['apg']
                 stealspergame, blockspergame, turnoverspergame = statistic['spg'], statistic['bpg'], statistic['tpg']
@@ -381,7 +395,35 @@ class OutputFrame(ctk.CTkScrollableFrame):
             except Exception:
                 matchup_label = ctk.CTkLabel(self, text='Game not found', font=('', 17))
                 matchup_label.grid(sticky='w', padx=(20, 0))
-                
+
+
+        elif self.output == 'teams':
+            team_standings = [NbaTeam().fetch_top_eastern_teams(), NbaTeam().fetch_top_western_teams()]
+
+            for standings in team_standings:
+
+                for standing in standings:
+
+                    team_name, conference = standing['team'], standing['conference']
+                    wins, losses, winrate = standing['wins'], standing['losses'], standing['winrate'] 
+                    streak, games_played = standing['streak'], standing['games_played']
+
+                    team_name_label = ctk.CTkLabel(self, text=team_name, font=('', 15, 'bold'))
+                    conference_label = team_label = ctk.CTkLabel(self, text=f'   Conference: {conference}')
+                    wins_label = ctk.CTkLabel(self, text=f'   Wins: {wins}')
+                    losses_label = ctk.CTkLabel(self, text=f'   Losses: {losses}')
+                    winrate_label = ctk.CTkLabel(self, text=f'   Winrate: {winrate}')
+                    streak_label = ctk.CTkLabel(self, text=f'   Streak: {streak}')
+                    games_played = ctk.CTkLabel(self, text=f'   Games Played: {games_played}')
+
+                    team_name_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+                    conference_label.grid(sticky='w', padx=(20, 0))
+                    wins_label.grid(sticky='w', padx=(20, 0))
+                    losses_label.grid(sticky='w', padx=(20, 0))
+                    winrate_label.grid(sticky='w', padx=(20, 0))
+                    streak_label.grid(sticky='w', padx=(20, 0))
+                    games_played.grid(sticky='w', padx=(20, 0))
+        
 
     def update_page(self, current_page):
         self.current_page = current_page
@@ -414,11 +456,11 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.scrape_log = FileHandler().read('nba_data/log.json')
+        # self.scrape_log = FileHandler().read('nba_data/log.json')
 
-        if self.scrape_log != str(d.today()):
-            FileHandler('schedule').store()
-            self.run_spider(NbaScraperSpider)
+        # if self.scrape_log != str(d.today()):
+        #     FileHandler('schedule').store()
+        #     self.run_spider(NbaScraperSpider)
 
         self.mainframe = MainFrame(self)
 
