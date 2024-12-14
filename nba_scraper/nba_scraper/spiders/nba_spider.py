@@ -2,6 +2,14 @@ import scrapy
 
 class NbaScraperSpider(scrapy.Spider):
     name = 'nbascraper'
+    custom_settings = {
+        "FEEDS": {
+            "nba_data/statistics.json": {
+                "format": "json",
+                "overwrite": True,
+            },
+        },
+    }
     start_urls = ['https://www.nbastuffer.com/2024-2025-nba-player-stats/']
 
     def parse(self, response):
@@ -40,6 +48,14 @@ class NbaScraperSpider(scrapy.Spider):
 
 class NbaTeamScraperSpider(scrapy.Spider):
     name = 'nbateamscraper'
+    custom_settings = {
+        "FEEDS": {
+            "nba_data/teams.json": {
+                "format": "json",
+                "overwrite": True,
+            },
+        },
+    }
     start_urls = ['https://www.nbastuffer.com/2024-2025-nba-team-stats/']
 
     def parse(self, response):
