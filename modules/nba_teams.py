@@ -65,7 +65,7 @@ class NbaTeam:
 
 
 def main():
-    print(NbaTeam().fetch_team_standing('oklahoma city'))
+    pass
 
 if __name__ == '__main__':
     main()
