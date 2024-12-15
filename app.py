@@ -14,6 +14,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
 from utils.nba_schedule import *
 from utils.nba_statistics import *
 from utils.nba_teams import *
+from utils.filehandler import *
 
 class MainFrame(ctk.CTkFrame):
     def __init__(self, master):
