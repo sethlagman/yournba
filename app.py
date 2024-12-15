@@ -5,7 +5,7 @@ import os
 from datetime import date as d
 from tkinter import messagebox
 from PIL import Image, ImageTk
-from nba_scraper.nba_scraper.spiders.nba_spider import NbaScraperSpider
+from nba_scraper.nba_scraper.spiders.nba_spider import NbaScraperSpider, NbaTeamScraperSpider
 from scrapy.crawler import CrawlerProcess
 from webbrowser import open as openbrowser
 
@@ -61,7 +61,7 @@ class PaginationFrame(ctk.CTkFrame):
         if data == 'statistics':
             return len(NbaStatistics().statistics)
         
-        if data == 'teams':
+        if data == 'standings':
             return 0
         
         if data == 'game_today':
@@ -121,8 +121,8 @@ class SideBarFrame(ctk.CTkFrame):
         statistics_btn = ctk.CTkButton(self, text='Statistics', height=35, width=150, command=self.update_output_to_statistics)
         statistics_btn.grid(column=0, row=3, pady=(20, 30))
 
-        teams_btn = ctk.CTkButton(self, text='Teams', height=35, width=150, command=self.update_output_to_teams)
-        teams_btn.grid(column=0, row=4, pady=(20, 30))
+        standings_btn = ctk.CTkButton(self, text='Standings', height=35, width=150, command=self.update_output_to_standings)
+        standings_btn.grid(column=0, row=4, pady=(20, 30))
 
         github_img = ctk.CTkImage(Image.open('images/githublogo.png').resize((35, 35)))
         github_btn = ctk.CTkButton(
@@ -167,8 +167,8 @@ class SideBarFrame(ctk.CTkFrame):
         openbrowser('https://github.com/sethlagman/yournba')
 
 
-    def update_output_to_teams(self):
-        self.output_frame.update_output('teams')
+    def update_output_to_standings(self):
+        self.output_frame.update_output('standings')
         self.pagination_frame.update_nextbtn_state(self.output_frame.output)
         self.pagination_frame.update_prevbtn_state()
 
@@ -201,9 +201,10 @@ class EntryFrame(ctk.CTkFrame):
         self.grid_columnconfigure(1, weight=5)
         self.grid_columnconfigure(2, weight=1)
 
+        self.master = master
         self.output_frame = output_frame
 
-        self.optionmenu = ctk.CTkOptionMenu(self, values=['Date', 'Player', 'Game Id'], height=31, command=self.optionmenu_callback)
+        self.optionmenu = ctk.CTkOptionMenu(self, values=['Date', 'Player', 'Game Id', 'Team'], height=31, command=self.optionmenu_callback)
         self.optionmenu.grid(row=1, column=0)
 
         self.search = ctk.CTkEntry(self, placeholder_text=f'Search for {self.optionmenu.get()} (MM/DD/YYYY)', height=30)
@@ -218,8 +219,18 @@ class EntryFrame(ctk.CTkFrame):
 
 
     def optionmenu_callback(self, choice):
+        self.search.delete(0, 'end')
+        self.search._activate_placeholder()
+        self.master.focus()
+        
         if choice == 'Date':
             self.search.configure(placeholder_text=f'Search for {choice} (MM/DD/YY)')
+
+        elif choice == 'Player':
+            self.search.configure(placeholder_text=f'Search for {choice} (Fullname, ex. Lebron James)')
+
+        elif choice == 'Team':
+            self.search.configure(placeholder_text=f'Search for {choice} (State, ex. San Antonio)')
 
         else:
             self.search.configure(placeholder_text=f'Search for {choice}')
@@ -397,7 +408,7 @@ class OutputFrame(ctk.CTkScrollableFrame):
                 matchup_label.grid(sticky='w', padx=(20, 0))
 
 
-        elif self.output == 'teams':
+        elif self.output == 'standings':
             team_standings = [NbaTeam().fetch_top_eastern_teams(), NbaTeam().fetch_top_western_teams()]
 
             for standings in team_standings:
@@ -423,7 +434,36 @@ class OutputFrame(ctk.CTkScrollableFrame):
                     winrate_label.grid(sticky='w', padx=(20, 0))
                     streak_label.grid(sticky='w', padx=(20, 0))
                     games_played.grid(sticky='w', padx=(20, 0))
-        
+
+
+        elif self.output == 'team':
+            try:
+                standing = NbaTeam().fetch_team_standing(self.entry.strip().lower())
+
+                team_name, conference = standing['team'], standing['conference']
+                wins, losses, winrate = standing['wins'], standing['losses'], standing['winrate'] 
+                streak, games_played = standing['streak'], standing['games_played']
+
+                team_name_label = ctk.CTkLabel(self, text=team_name, font=('', 15, 'bold'))
+                conference_label = team_label = ctk.CTkLabel(self, text=f'   Conference: {conference}')
+                wins_label = ctk.CTkLabel(self, text=f'   Wins: {wins}')
+                losses_label = ctk.CTkLabel(self, text=f'   Losses: {losses}')
+                winrate_label = ctk.CTkLabel(self, text=f'   Winrate: {winrate}')
+                streak_label = ctk.CTkLabel(self, text=f'   Streak: {streak}')
+                games_played = ctk.CTkLabel(self, text=f'   Games Played: {games_played}')
+
+                team_name_label.grid(sticky='w', padx=(20, 0), pady=(10, 10))
+                conference_label.grid(sticky='w', padx=(20, 0))
+                wins_label.grid(sticky='w', padx=(20, 0))
+                losses_label.grid(sticky='w', padx=(20, 0))
+                winrate_label.grid(sticky='w', padx=(20, 0))
+                streak_label.grid(sticky='w', padx=(20, 0))
+                games_played.grid(sticky='w', padx=(20, 0))
+            
+            except Exception:
+                team_label = ctk.CTkLabel(self, text='Team not found', font=('', 17))
+                team_label.grid(sticky='w', padx=(20, 0))
+
 
     def update_page(self, current_page):
         self.current_page = current_page
@@ -456,29 +496,21 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        # self.scrape_log = FileHandler().read('nba_data/log.json')
+        self.scrape_log = FileHandler().read('nba_data/log.json')
 
-        # if self.scrape_log != str(d.today()):
-        #     FileHandler('schedule').store()
-        #     self.run_spider(NbaScraperSpider)
+        if self.scrape_log != str(d.today()):
+            FileHandler('schedule').store()
+            self.run_spider(NbaScraperSpider, NbaTeamScraperSpider)
 
         self.mainframe = MainFrame(self)
 
 
-    def run_spider(self, spider):
+    def run_spider(self, spider_1, spider_2):
         FileHandler().store(filename='nba_data/log.json', data=str(d.today()))
 
-        os.remove('nba_data/statistics.json')
-        
-        process = CrawlerProcess(
-        settings={
-            "FEEDS": {
-                "nba_data/statistics.json": {"format": "json"},
-                },
-            }
-        )
-
-        process.crawl(spider)
+        process = CrawlerProcess()
+        process.crawl(spider_1)
+        process.crawl(spider_2)
         process.start()
 
 
