@@ -9,11 +9,11 @@ from nba_scraper.nba_scraper.spiders.nba_spider import NbaScraperSpider, NbaTeam
 from scrapy.crawler import CrawlerProcess
 from webbrowser import open as openbrowser
 
-sys.path.append(os.path.join(os.path.dirname(__file__), 'modules'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
 
-from modules.nba_schedule import *
-from modules.nba_statistics import *
-from modules.nba_teams import *
+from utils.nba_schedule import *
+from utils.nba_statistics import *
+from utils.nba_teams import *
 
 class MainFrame(ctk.CTkFrame):
     def __init__(self, master):
