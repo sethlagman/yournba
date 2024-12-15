@@ -18,7 +18,11 @@ Your ultimate companion for everything NBA
 - The data is updated on a daily basis, not in real-time.
 - It requires internet
 
-## Installation
+## Easy Installation
+
+- [Download the latest release or executable file](https://github.com/sethlagman/yournba/releases/tag/v1.0.0)
+
+## Developer Installation
 
 - [X]  [Download Python 3.13.0](https://www.python.org/downloads/release/python-3130/)
 - [X]  Clone or download this repository
