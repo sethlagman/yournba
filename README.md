@@ -8,7 +8,7 @@ Your ultimate companion for everything NBA
 ## Features
 
 - Searches for games given a specific schedule date
-- Shows the current nba for the day
+- Shows the current games for the day
 - Searches for the player statistics
 - Searches for game given its game id
 - Searches for a team's standings
