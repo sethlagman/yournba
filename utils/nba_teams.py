@@ -8,7 +8,7 @@ class NbaTeam:
     def __init__(self):
         """Initialize attributes"""
 
-        self.teams = FileHandler().read(r'nba_data\teams.json')
+        self.teams = FileHandler().read(r'data\teams.json')
 
     def fetch_team_standing(self, team):
 

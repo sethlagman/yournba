@@ -124,7 +124,7 @@ class SideBarFrame(ctk.CTkFrame):
         standings_btn = ctk.CTkButton(self, text='Standings', height=35, width=150, command=self.update_output_to_standings)
         standings_btn.grid(column=0, row=4, pady=(20, 30))
 
-        github_img = ctk.CTkImage(Image.open('images/githublogo.png').resize((35, 35)))
+        github_img = ctk.CTkImage(Image.open('assets/images/githublogo.png').resize((35, 35)))
         github_btn = ctk.CTkButton(
             self,
             command=self.open_github,
@@ -141,7 +141,7 @@ class SideBarFrame(ctk.CTkFrame):
         )
         github_btn.grid(column=0, row=5, sticky='se', pady=(0, 50), padx=(0, 60))
 
-        githubrepo_img = ctk.CTkImage(Image.open('images/githubrepo.png').resize((35, 35)))
+        githubrepo_img = ctk.CTkImage(Image.open('assets/images/githubrepo.png').resize((35, 35)))
         githubrepo_btn = ctk.CTkButton(
             self,
             command=self.open_github_repo,
@@ -488,7 +488,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.geometry(f'{850}x{700}')
-        self.iconbitmap(r'images\nbalogo.ico')
+        self.iconbitmap(r'assets\images\nbalogo.ico')
         self.resizable(False, False)
         self.title('')
         self.protocol('WM_DELETE_WINDOW', self.exit_app)
@@ -496,7 +496,7 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.scrape_log = FileHandler().read('nba_data/log.json')
+        self.scrape_log = FileHandler().read('assets/logs/log.json')
 
         if self.scrape_log != str(d.today()):
             FileHandler('schedule').store()
@@ -506,7 +506,7 @@ class App(ctk.CTk):
 
 
     def run_spider(self, spider_1, spider_2):
-        FileHandler().store(filename='nba_data/log.json', data=str(d.today()))
+        FileHandler().store(filename='assets/logs/log.json', data=str(d.today()))
 
         process = CrawlerProcess()
         process.crawl(spider_1)

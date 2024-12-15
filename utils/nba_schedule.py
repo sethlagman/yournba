@@ -8,7 +8,7 @@ class NbaSchedule:
     def __init__(self) -> None:
         """Initialize attributes"""
 
-        self.schedule = FileHandler().read(r'nba_data\schedule.json')
+        self.schedule = FileHandler().read(r'data\schedule.json')
 
     def fetch_shedule(self) -> dict:
         """

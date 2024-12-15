@@ -10,7 +10,7 @@ class NbaStatistics:
     def __init__(self) -> None:
         """Initialize attributes"""
 
-        self.statistics = FileHandler().read(filename=r'nba_data\statistics.json')
+        self.statistics = FileHandler().read(filename=r'data\statistics.json')
 
     def fetch_player_statistics(self, first_name: str, last_name: str) -> dict:
         """
