@@ -4,7 +4,7 @@ import os
 
 from datetime import date as d
 from tkinter import messagebox
-from PIL import Image, ImageTk
+from PIL import Image
 from nba_scraper.nba_scraper.spiders.nba_spider import NbaScraperSpider, NbaTeamScraperSpider
 from scrapy.crawler import CrawlerProcess
 from webbrowser import open as openbrowser
