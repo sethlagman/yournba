@@ -35,7 +35,7 @@ Your ultimate companion for everything NBA
     - For Windows: `venv\Scripts\activate`
 - [X]  Install the dependencies
     - `pip install -r requirements.txt`
-- [X]  Run the app or `python app.py`
+- [X]  Run the app or `python yournba.py`
 
 ## Creation
 
