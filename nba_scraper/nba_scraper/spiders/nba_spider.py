@@ -4,7 +4,7 @@ class NbaScraperSpider(scrapy.Spider):
     name = 'nbascraper'
     custom_settings = {
         "FEEDS": {
-            "nba_data/statistics.json": {
+            "data/statistics.json": {
                 "format": "json",
                 "overwrite": True,
             },
@@ -50,7 +50,7 @@ class NbaTeamScraperSpider(scrapy.Spider):
     name = 'nbateamscraper'
     custom_settings = {
         "FEEDS": {
-            "nba_data/teams.json": {
+            "data/teams.json": {
                 "format": "json",
                 "overwrite": True,
             },
